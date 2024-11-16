@@ -1,7 +1,17 @@
+#include <time.h>
 #include "lib.h"
 
-int main() {
+#define carros 100
 
+int gera_caminho(int max, int min){
+    int caminho = rand() % (max - min + 1) + min;
+    return caminho;
+}
+
+int main() {
+    
+    srand(time(NULL));
+    
     Automaton afd_a;
 
     // definindo os estados (usuario pode definir como desejar)
@@ -122,7 +132,7 @@ int main() {
     }
     
     printf("Palavra de A (+eficiente): %s \n", palavra_a); 
-    simulate_afd(&afd_a, palavra_a);
+    //simulate_afd(&afd_a, palavra_a);
     printf("\n");
 
 
@@ -143,7 +153,7 @@ int main() {
     }
     
     printf("Palavra de B (+eficiente): %s \n", palavra_b); 
-    simulate_afd(&afd_b, palavra_b);
+    //simulate_afd(&afd_b, palavra_b);
     printf("\n");
 
 
@@ -152,7 +162,7 @@ int main() {
     // 1: inicia e segue até estacionar apos C2 (primeiro semaforo)
     strcpy(palavra_c, "ccp");
     printf("Palavra de C (+eficiente): %s \n", palavra_c); 
-    simulate_afd(&afd_c, palavra_c);
+    //simulate_afd(&afd_c, palavra_c);
     printf("\n");
 
 
@@ -173,10 +183,38 @@ int main() {
     }
     
     printf("Palavra de D (+eficiente): %s \n", palavra_d); 
-    simulate_afd(&afd_d, palavra_d);
+    //simulate_afd(&afd_d, palavra_d);
     printf("\n");
 
+    char palavra[carros];
+    printf("\nInsira a palavra que deseja testar:\n");
+    scanf("%s", palavra);
 
+    int tam_string = strlen(palavra);
+
+    for(int i = 0; i < tam_string; i++){
+        switch(palavra[i]){
+            case 'a':
+            printf("\nCarro inicia em A!\n");
+            break;
+
+            case 'b':
+            printf("\nCarro inicia em B!\n");
+            break;
+
+            case 'c':
+            printf("\nCarro inicia em C!\n");
+            break;
+
+            case 'd':
+            printf("\nCarro inicia em D!\n");
+            break;
+
+            default:
+            printf("\nSimbolo nao reconhecido!\n");
+            break;
+        }
+    }
 
     return 0;
 }

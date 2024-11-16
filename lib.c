@@ -1,5 +1,4 @@
 #include "lib.h"
-#include <time.h>
 
 // funcao para verificar se o estado eh um estado de aceitacao
 int eh_estado_aceito(Automaton *afd, int estado) {
@@ -50,8 +49,8 @@ int simulate_afd(Automaton *afd, char *palavra) {
     }
 }
 
-int gera_caminho(int max, int min){
-    srand(time(NULL));
-    int caminho = rand() % (max - min + 1) + min;
-    return caminho;
+void iniciar_semaforo(Semaforo* semaforo){
+    semaforo->estado1 = 1; // inicializa como verde
+    semaforo->estado2 = 1; // inicializa como verde
+    semaforo->topo = -1;
 }

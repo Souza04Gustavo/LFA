@@ -216,5 +216,18 @@ int main() {
         }
     }
 
+    Semaforo c2;
+    
+    iniciar_semaforo(&c2);
+    
+    // empilhando para testes (o max permitido é 3)
+    //empilhar_carro(&c2);
+    //desempilhar_carro(&c2);
+    //mudarEstado(&c2);
+
+    criarFluxo(&afd_a, &afd_b, &afd_c, &afd_d, &c2, palavra);
+    
+
+
     return 0;
 }

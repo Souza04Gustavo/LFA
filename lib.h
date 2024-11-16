@@ -4,7 +4,7 @@
 #define max_estados 10
 #define max_transicoes 100
 #define max_alfabeto 5
-#define max_carros 10
+#define max_carros 10 // qnt de carros andando ao mesmo tempo
 
 // estrutura para transicao
 typedef struct {
@@ -34,3 +34,7 @@ typedef struct{
 int eh_estado_aceito(Automaton *afd, int estado);
 int pegar_prox_estado(Automaton *afd, int estado_atual, char simbolo);
 int simulate_afd(Automaton *afd, char *palavra);
+
+//void iniciar_semaforo(Semaforo* semaforo);
+void empilhar_carro(Semaforo *semaforo);
+void mudarEstado(Semaforo *semaforo);

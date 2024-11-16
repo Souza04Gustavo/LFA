@@ -1,6 +1,7 @@
 #include "lib.h"
 
 int main() {
+
     Automaton afd_a;
 
     // definindo os estados (usuario pode definir como desejar)
@@ -102,21 +103,79 @@ int main() {
     char palavra_c[100];  // palavra a ser processada com inicio em C
     char palavra_d[100];  // palavra a ser processada com inicio em D
 
-    printf("Digite a palavra iniciando em A: ");
-    scanf("%s", palavra_a);
-    simulate_afd(&afd_a, palavra_a);
+    // GERANDO CAMINHOS DE A
+    // para o caminho A há duas possibilidades:
+    // 1: iniciar e ja estacionar
+    // 2: ir reto, fazer a rotatoria, e seguir ate o estacionamento
+
+    //fazendo um rand para qual caminho sera escolhido visto que o carro DEVE chegar a um estacionamento
+    int min_a = 1;
+    int max_a = 2;
+    int caminho_a = gera_caminho(max_a, min_a);
+    printf("Caminho escolhido para A: %d\n", caminho_a); 
+
+    //criando os caminhos possiveis para A
+    if(caminho_a == 1){
+        strcpy(palavra_a, "p");
+    }else{
+        strcpy(palavra_a, "aaaraaap");
+    }
     
-    printf("Digite a palavra iniciando em B: ");
-    scanf("%s", palavra_b);
+    printf("Palavra de A (+eficiente): %s \n", palavra_a); 
+    simulate_afd(&afd_a, palavra_a);
+    printf("\n");
+
+
+    // GERANDO CAMINHOS DE B
+    // para o caminho de B há duas possibilidades (igual A):
+    // 1: iniciar e ja estacionar
+    // 2: ir reto, fazer a rotatoria, e seguir ate o estacionamento
+    int min_b = 1;
+    int max_b = 2;
+    int caminho_b = gera_caminho(max_b, min_b);
+    printf("Caminho escolhido para B: %d\n", caminho_b); 
+
+    //criando os caminhos possiveis para B
+    if(caminho_b == 1){
+        strcpy(palavra_b, "p");
+    }else{
+        strcpy(palavra_b, "bbbrbbbp");
+    }
+    
+    printf("Palavra de B (+eficiente): %s \n", palavra_b); 
     simulate_afd(&afd_b, palavra_b);
+    printf("\n");
 
-    printf("Digite a palavra iniciando em C: ");
-    scanf("%s", palavra_c);
+
+    // GERANDO CAMINHOS DE C
+    // para o caminho C há somente uma possibilidade:
+    // 1: inicia e segue até estacionar apos C2 (primeiro semaforo)
+    strcpy(palavra_c, "ccp");
+    printf("Palavra de C (+eficiente): %s \n", palavra_c); 
     simulate_afd(&afd_c, palavra_c);
+    printf("\n");
 
-    printf("Digite a palavra iniciando em D: ");
-    scanf("%s", palavra_d);
+
+    // GERANDO CAMINHOS DE D
+    // para o caminho D há duas possibilidades:
+    // 1: inicia e segue até estacionar (antes do semaforo)
+    // 2: inicia e segue até passar o semaforo, ai estaciona
+    int min_d = 1;
+    int max_d = 2;
+    int caminho_d = gera_caminho(max_d, min_d);
+    printf("Caminho escolhido para D: %d\n", caminho_d); 
+
+    //criando os caminhos possiveis para D
+    if(caminho_d == 1){
+        strcpy(palavra_d, "dp");
+    }else{
+        strcpy(palavra_d, "ddp");
+    }
+    
+    printf("Palavra de D (+eficiente): %s \n", palavra_d); 
     simulate_afd(&afd_d, palavra_d);
+    printf("\n");
+
 
 
     return 0;

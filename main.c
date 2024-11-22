@@ -12,6 +12,7 @@ int main() {
     
     srand(time(NULL));
     
+    /*
     Automaton afd_a;
 
     // definindo os estados (usuario pode definir como desejar)
@@ -36,6 +37,7 @@ int main() {
     afd_a.transitions[6] = (Transicao){4, 'a', 5};
     afd_a.transitions[7] = (Transicao){5, 'a', 6};
     afd_a.transitions[8] = (Transicao){6, 'p', 7};
+    */
 
     Automaton afd_b;
 
@@ -83,7 +85,7 @@ int main() {
     afd_c.transitions[3] = (Transicao){2, 'c', 3};  
     afd_c.transitions[4] = (Transicao){3, 'r', 3};  
 
-
+    /*
     Automaton afd_d;
 
     // definindo os estados (usuario pode definir como desejar)
@@ -106,7 +108,7 @@ int main() {
     afd_d.transitions[3] = (Transicao){2, 'd', 3};  
     afd_d.transitions[4] = (Transicao){2, 'p', 5};  
     afd_d.transitions[5] = (Transicao){3, 'r', 3};  
-
+    */
 
     char palavra_a[100];  // palavra a ser processada com inicio em A
     char palavra_b[100];  // palavra a ser processada com inicio em B
@@ -190,6 +192,7 @@ int main() {
     printf("\nInsira a palavra que deseja testar:\n");
     scanf("%s", palavra);
 
+    /*
     int tam_string = strlen(palavra);
 
     for(int i = 0; i < tam_string; i++){
@@ -215,19 +218,16 @@ int main() {
             break;
         }
     }
+    */
 
     Semaforo c2;
-    
     iniciar_semaforo(&c2);
     
-    // empilhando para testes (o max permitido é 3)
-    //empilhar_carro(&c2);
-    //desempilhar_carro(&c2);
-    //mudarEstado(&c2);
+    // Simulação do fluxo
+    printf("Iniciando simulação para os carros: %s\n", palavra);
+    //criarFluxoAlternado(&afd_b, &afd_c, palavra_b, palavra_c, palavra);
 
-    criarFluxo(&afd_a, &afd_b, &afd_c, &afd_d, &c2, palavra);
-    
-
+    criarFluxoComSemaforo(&afd_b, &afd_c, palavra_b, palavra_c, palavra, &c2);
 
     return 0;
 }

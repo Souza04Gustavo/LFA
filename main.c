@@ -5,9 +5,12 @@
 
 int main() {
     
-    printf("\n--- Trabalho Final da Matéria Linguagens Formais e Autômatos ---\n");
-    printf("Professor: Ricardo Ferreira Martins.\n");
+    printf("\n==================================================================\n");
+    printf("\n---- TRABALHO FINAL DA MATÉRIA LINGUAGENS FORMAIS E AUTÕMATOS ----\n");
+    printf("\nProfessor: Ricardo Ferreira Martins.\n");
     printf("Alunos: Gustavo de Souza; José Augusto Laube.\n");
+    printf("\n==================================================================\n");
+
     srand(time(NULL));
     
     Automaton afd_a;
@@ -110,77 +113,6 @@ int main() {
     char palavra_c[100];  // palavra a ser processada com inicio em C
     char palavra_d[100];  // palavra a ser processada com inicio em D
 
-    /*
-    // GERANDO CAMINHOS DE A
-    // para o caminho A há duas possibilidades:
-    // 1: iniciar e ja estacionar
-    // 2: ir reto, fazer a rotatoria, e seguir ate o estacionamento
-
-    //fazendo um rand para qual caminho sera escolhido visto que o carro DEVE chegar a um estacionamento
-    int min_a = 1;
-    int max_a = 2;
-    int caminho_a = gera_caminho(max_a, min_a);
-    printf("Caminho escolhido para A: %d\n", caminho_a); 
-
-    //criando os caminhos possiveis para A
-    if(caminho_a == 1){
-        strcpy(palavra_a, "p");
-    }else{
-        strcpy(palavra_a, "aaaraaap");
-    }
-    
-    printf("Palavra de A (+eficiente): %s \n", palavra_a); 
-    printf("\n");
-
-
-    // GERANDO CAMINHOS DE B
-    // para o caminho de B há duas possibilidades (igual A):
-    // 1: iniciar e ja estacionar
-    // 2: ir reto, fazer a rotatoria, e seguir ate o estacionamento
-    int min_b = 1;
-    int max_b = 2;
-    int caminho_b = gera_caminho(max_b, min_b);
-    printf("Caminho escolhido para B: %d\n", caminho_b); 
-
-    //criando os caminhos possiveis para B
-    if(caminho_b == 1){
-        strcpy(palavra_b, "p");
-    }else{
-        strcpy(palavra_b, "bbbrbbbp");
-    }
-    
-    printf("Palavra de B (+eficiente): %s \n", palavra_b); 
-    printf("\n");
-
-
-    // GERANDO CAMINHOS DE C
-    // para o caminho C há somente uma possibilidade:
-    // 1: inicia e segue até estacionar apos C2 (primeiro semaforo)
-    strcpy(palavra_c, "ccp");
-    printf("Palavra de C (+eficiente): %s \n", palavra_c); 
-    printf("\n");
-
-
-    // GERANDO CAMINHOS DE D
-    // para o caminho D há duas possibilidades:
-    // 1: inicia e segue até estacionar (antes do semaforo)
-    // 2: inicia e segue até passar o semaforo, ai estaciona
-    int min_d = 1;
-    int max_d = 2;
-    int caminho_d = gera_caminho(max_d, min_d);
-    printf("Caminho escolhido para D: %d\n", caminho_d); 
-
-    //criando os caminhos possiveis para D
-    if(caminho_d == 1){
-        strcpy(palavra_d, "dp");
-    }else{
-        strcpy(palavra_d, "ddp");
-    }
-    
-    printf("Palavra de D (+eficiente): %s \n", palavra_d); 
-    printf("\n");
-    */
-
     int menu = 1;
     int cont= 0;
     int opcao;
@@ -188,10 +120,10 @@ int main() {
     char palavra_teste[100];
 
     while(menu){
-            printf("\n\n\n--- MENU DE SELEÇÃO ---\n");
+            printf("\n\n\n======= MENU DE SELEÇÃO =======\n");
             printf("(1) Simular AFDs de fluxos separadamente;\n");
             printf("(2) Simular fluxo com semaforos (SEM TROCA DE DIREÇÃO);\n");
-            printf("(3) Simular fluxo com semaforos (COM TROCA DE DIREÇÃO)(NAO FUNCIONA);\n");
+            printf("(3) Simular fluxo com semaforos (COM TROCA DE DIREÇÃO)(NAO IMPLEMENTADO);\n");
             printf("(0) Para finalizar o programa;\n");
 
             scanf("%d", &opcao);
@@ -252,22 +184,33 @@ int main() {
                 break; // break do case 1 do switch opcao
 
                 case 2: // simulação do fluxo (SEM CURVA)
+                
                 char palavra[carros];
+                definir_caminhos_eficientes(palavra_a, palavra_b, palavra_c, palavra_d);
+
                 printf("\nInsira a palavra que deseja testar:\n");
                 scanf("%s", palavra);
 
                 Semaforo c2;
                 iniciar_semaforo(&c2);
-    
+                
+                Semaforo c3;
+                iniciar_semaforo(&c3);
+                
+                char palavra_ad[100];
+                char palavra_bc[100];
+                separarCaracteres(palavra, palavra_bc, palavra_ad);
+                
                 // Simulação do fluxo
-                printf("Iniciando simulação para os carros: %s\n", palavra);
-                criarFluxoComSemaforo_BC(&afd_b, &afd_c, palavra_b, palavra_c, palavra, &c2);
+                // fluxo divido em rezão dos modelos e não haver conflito de vias
+                criarFluxoComSemaforo_BC(&afd_b, &afd_c, palavra_b, palavra_c, palavra_bc, &c2);
+                
+                criarFluxoComSemaforo_AD(&afd_a, &afd_d, palavra_a, palavra_d, palavra_ad, &c3);
 
                 break;
 
                 case 3: // simulação do fluxo (COM CURVA)
-                definir_caminhos_eficientes(palavra_a, palavra_b, palavra_c, palavra_d);
-                break;  
+                break; 
 
                 default:
                 printf("Digito invalido!\n");

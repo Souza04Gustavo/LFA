@@ -34,7 +34,10 @@ typedef struct{
 int eh_estado_aceito(Automaton *afd, int estado);
 int pegar_prox_estado(Automaton *afd, int estado_atual, char simbolo);
 int simulate_afd(Automaton *afd, char *palavra);
-
-//void iniciar_semaforo(Semaforo* semaforo);
-void empilhar_carro(Semaforo *semaforo);
-void mudarEstado(Semaforo *semaforo);
+int gerar_caminho(int max, int min);
+void iniciar_semaforo(Semaforo *semaforo);
+void adicionar_veiculo(Semaforo *semaforo, int fluxo);
+void desempilhar_carro(Semaforo * semaforo);
+void alterar_estado(Semaforo * semaforo);
+void definir_caminhos_eficientes(char *palavra_a, char *palavra_b, char *palavra_c, char *palavra_d);
+void criarFluxoComSemaforo_BC(Automaton *afd_b, Automaton *afd_c, char *palavra_b, char *palavra_c, char *carros, Semaforo *semaforo);

@@ -3,16 +3,13 @@
 
 #define carros 100
 
-int gera_caminho(int max, int min){
-    int caminho = rand() % (max - min + 1) + min;
-    return caminho;
-}
-
 int main() {
     
+    printf("\n--- Trabalho Final da Matéria Linguagens Formais e Autômatos ---\n");
+    printf("Professor: Ricardo Ferreira Martins.\n");
+    printf("Alunos: Gustavo de Souza; José Augusto Laube.\n");
     srand(time(NULL));
     
-    /*
     Automaton afd_a;
 
     // definindo os estados (usuario pode definir como desejar)
@@ -37,7 +34,7 @@ int main() {
     afd_a.transitions[6] = (Transicao){4, 'a', 5};
     afd_a.transitions[7] = (Transicao){5, 'a', 6};
     afd_a.transitions[8] = (Transicao){6, 'p', 7};
-    */
+    
 
     Automaton afd_b;
 
@@ -85,7 +82,6 @@ int main() {
     afd_c.transitions[3] = (Transicao){2, 'c', 3};  
     afd_c.transitions[4] = (Transicao){3, 'r', 3};  
 
-    /*
     Automaton afd_d;
 
     // definindo os estados (usuario pode definir como desejar)
@@ -108,13 +104,13 @@ int main() {
     afd_d.transitions[3] = (Transicao){2, 'd', 3};  
     afd_d.transitions[4] = (Transicao){2, 'p', 5};  
     afd_d.transitions[5] = (Transicao){3, 'r', 3};  
-    */
 
     char palavra_a[100];  // palavra a ser processada com inicio em A
     char palavra_b[100];  // palavra a ser processada com inicio em B
     char palavra_c[100];  // palavra a ser processada com inicio em C
     char palavra_d[100];  // palavra a ser processada com inicio em D
 
+    /*
     // GERANDO CAMINHOS DE A
     // para o caminho A há duas possibilidades:
     // 1: iniciar e ja estacionar
@@ -134,7 +130,6 @@ int main() {
     }
     
     printf("Palavra de A (+eficiente): %s \n", palavra_a); 
-    //simulate_afd(&afd_a, palavra_a);
     printf("\n");
 
 
@@ -155,7 +150,6 @@ int main() {
     }
     
     printf("Palavra de B (+eficiente): %s \n", palavra_b); 
-    //simulate_afd(&afd_b, palavra_b);
     printf("\n");
 
 
@@ -164,7 +158,6 @@ int main() {
     // 1: inicia e segue até estacionar apos C2 (primeiro semaforo)
     strcpy(palavra_c, "ccp");
     printf("Palavra de C (+eficiente): %s \n", palavra_c); 
-    //simulate_afd(&afd_c, palavra_c);
     printf("\n");
 
 
@@ -185,49 +178,105 @@ int main() {
     }
     
     printf("Palavra de D (+eficiente): %s \n", palavra_d); 
-    //simulate_afd(&afd_d, palavra_d);
     printf("\n");
-
-    char palavra[carros];
-    printf("\nInsira a palavra que deseja testar:\n");
-    scanf("%s", palavra);
-
-    /*
-    int tam_string = strlen(palavra);
-
-    for(int i = 0; i < tam_string; i++){
-        switch(palavra[i]){
-            case 'a':
-            printf("\nCarro inicia em A!\n");
-            break;
-
-            case 'b':
-            printf("\nCarro inicia em B!\n");
-            break;
-
-            case 'c':
-            printf("\nCarro inicia em C!\n");
-            break;
-
-            case 'd':
-            printf("\nCarro inicia em D!\n");
-            break;
-
-            default:
-            printf("\nSimbolo nao reconhecido!\n");
-            break;
-        }
-    }
     */
 
-    Semaforo c2;
-    iniciar_semaforo(&c2);
-    
-    // Simulação do fluxo
-    printf("Iniciando simulação para os carros: %s\n", palavra);
-    //criarFluxoAlternado(&afd_b, &afd_c, palavra_b, palavra_c, palavra);
+    int menu = 1;
+    int cont= 0;
+    int opcao;
+    char selecao;
+    char palavra_teste[100];
 
-    criarFluxoComSemaforo(&afd_b, &afd_c, palavra_b, palavra_c, palavra, &c2);
+    while(menu){
+            printf("\n\n\n--- MENU DE SELEÇÃO ---\n");
+            printf("(1) Simular AFDs de fluxos separadamente;\n");
+            printf("(2) Simular fluxo com semaforos (SEM TROCA DE DIREÇÃO);\n");
+            printf("(3) Simular fluxo com semaforos (COM TROCA DE DIREÇÃO)(NAO FUNCIONA);\n");
+            printf("(0) Para finalizar o programa;\n");
+
+            scanf("%d", &opcao);
+            getchar();
+
+            switch(opcao){
+
+                case 0:
+                menu--; // finaliza o menu
+                break;    
+
+                case 1:
+                printf("\nSelecione qual AFD deseja simular (A, B, C ou D):\n");
+                scanf(" %c", &selecao);
+                switch(selecao){    
+
+                    case 'A':
+                    printf("Insira uma palavra para testar o AFD A:\n");
+                    getchar();
+                    fgets(palavra_teste, sizeof(palavra_teste), stdin);
+                    palavra_teste[strcspn(palavra_teste, "\n")] = '\0'; // remover o \n do final caso tenha
+    
+                    simulate_afd(&afd_a, palavra_teste);
+                    break;
+
+                    case 'B':
+                    printf("Insira uma palavra para testar o AFD B:\n");
+                    getchar();
+                    fgets(palavra_teste, sizeof(palavra_teste), stdin);
+                    palavra_teste[strcspn(palavra_teste, "\n")] = '\0'; // remover o \n do final caso tenha
+                    
+                    simulate_afd(&afd_b, palavra_teste);
+                    break;
+
+                    case 'C':
+                    printf("Insira uma palavra para testar o AFD C:\n");
+                    getchar();
+                    fgets(palavra_teste, sizeof(palavra_teste), stdin);
+                    palavra_teste[strcspn(palavra_teste, "\n")] = '\0'; // remover o \n do final caso tenha
+                    
+                    simulate_afd(&afd_c, palavra_teste);
+                    break;
+
+                    case 'D':
+                    printf("Insira uma palavra para testar o AFD D:\n");
+                    getchar();
+                    fgets(palavra_teste, sizeof(palavra_teste), stdin);
+                    palavra_teste[strcspn(palavra_teste, "\n")] = '\0'; // remover o \n do final caso tenha
+                    
+                    simulate_afd(&afd_d, palavra_teste);
+                    break;
+
+                    default:
+                    printf("AFD invalido selecionado!\n");
+                    break;
+                }
+
+                break; // break do case 1 do switch opcao
+
+                case 2: // simulação do fluxo (SEM CURVA)
+                char palavra[carros];
+                printf("\nInsira a palavra que deseja testar:\n");
+                scanf("%s", palavra);
+
+                Semaforo c2;
+                iniciar_semaforo(&c2);
+    
+                // Simulação do fluxo
+                printf("Iniciando simulação para os carros: %s\n", palavra);
+                criarFluxoComSemaforo_BC(&afd_b, &afd_c, palavra_b, palavra_c, palavra, &c2);
+
+                break;
+
+                case 3: // simulação do fluxo (COM CURVA)
+                definir_caminhos_eficientes(palavra_a, palavra_b, palavra_c, palavra_d);
+                break;  
+
+                default:
+                printf("Digito invalido!\n");
+                break;
+
+            }
+    }
+
+    printf("\nPrograma finalizado!\n");
 
     return 0;
 }

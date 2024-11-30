@@ -1,6 +1,16 @@
-#include "lib.h"
+#define BLACK "\033[30m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define BLUE "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN "\033[36m"
+#define GRAY "\033[37m"
+#define RESET "\033[0m"
 
 #define max_contagem_carros 6 // quantidade de carros maxima no fluxo
+
+#include "lib.h"
 
 // funcao para verificar se o estado eh um estado de aceitacao
 int eh_estado_aceito(Automaton *afd, int estado) {
@@ -101,8 +111,8 @@ void alternar_estado_AD(Semaforo *semaforo) {
 
     // print pra teste de fluxo
     printf("Semaforo alterado: Fluxo A agora esta %s e Fluxo D está %s.\n", 
-            semaforo->estado1 ? "verde" : "vermelho", 
-            semaforo->estado2 ? "verde" : "vermelho");
+            semaforo->estado1 ? GREEN "verde" RESET : RED "vermelho" RESET, 
+            semaforo->estado2 ? GREEN "verde" RESET : RED "vermelho" RESET);
 }
 
 int gera_caminho(int max, int min){
@@ -161,150 +171,145 @@ void separarCaracteres(const char *entrada, char *saida_bc, char *saida_ad) {
     saida_ad[indice_ad] = '\0';
 }
 
-
-
 void criarFluxoComSemaforo_BC(Automaton *afd_b, Automaton *afd_c, char *palavra_b, char *palavra_c, char *carros, Semaforo *semaforo) {
-    int estados[max_contagem_carros] = {0}; // vetor para armazenar o estado atual do carro
-    int indices[max_contagem_carros] = {0}; // indices para acompanhar a posicao atual na palavra de cada carro
-    Automaton *automatos[max_contagem_carros] = {NULL}; // vetor de ponteiros para os automatos que representam cada carro
-    char *palavras[max_contagem_carros] = {NULL}; // caminhos de cada carro
-    int num_carros = strlen(carros);  // qnt de carros da simulação
+    int estados[max_contagem_carros] = {0}; // Estado atual dos carros
+    int indices[max_contagem_carros] = {0}; // Índices para acompanhar o progresso
+    Automaton *automatos[max_contagem_carros] = {NULL}; // Vetor de autômatos
+    char *palavras[max_contagem_carros] = {NULL}; // Caminhos de cada carro
+    int concluidos[max_contagem_carros] = {0}; // Carros que concluíram o percurso
+    int num_carros = strlen(carros); // Quantidade de carros
+    int carros_fluxo_b = 0, carros_fluxo_c = 0;
 
-    // verificação do numero de carros para nao exceder o limite
     if (num_carros > max_contagem_carros) {
-        printf("Erro: Número de carros excede o máximo permitido (%d).\n", max_contagem_carros);
+        printf(RED "Erro: Número de carros excede o máximo permitido (%d).\n" RESET, max_contagem_carros);
         return;
     }
 
-    // configuração inicial dos carros
+    // Inicializa os carros e define seus fluxos
     for (int i = 0; i < num_carros; i++) {
-        indices[i] = 0; // cada carro inicia na posição inicial do seu caminho
+        indices[i] = 0; 
+        concluidos[i] = 0;
+
         if (carros[i] == 'b') {
             automatos[i] = afd_b;
-            palavras[i] = palavra_b; // associa a palabra do fluxo B
+            palavras[i] = palavra_b;
             estados[i] = afd_b->estado_inicial;
+            carros_fluxo_b++;
         } else if (carros[i] == 'c') {
             automatos[i] = afd_c;
-            palavras[i] = palavra_c;  // associa a palavra do fluxo C
+            palavras[i] = palavra_c;
             estados[i] = afd_c->estado_inicial;
+            carros_fluxo_c++;
         } else {
-            // usuario inseriu letra invalida
-            printf("Erro: Letra '%c' inválida na palavra de carros.\n", carros[i]);
+            printf("Erro: Carro em fluxo desconhecido '%c'.\n", carros[i]);
             return;
         }
     }
 
-    printf("\n\n\n ---> INICIO DA SIMULAÇÃO BC SEM TROCA DE SENTIDO <----\n");
-    printf("\nSimulação para o(s) carro(s): %s\n", carros);
+    printf(CYAN "\n\n--------> INÍCIO DA SIMULAÇÃO BC <--------\n" RESET);
+    printf("Simulação para o(s) carro(s): %s\n", carros);
 
-    int concluidos = 0;  // Qnt de carros que concluiram o percurso
-    int ciclo = 0; // contador para os ciclos "passos" da simulação
+    int ciclo = 0, todos_concluidos = 0;
 
-    // inicializa contadores de carros para os fluxos B e C
-    int carros_b = 0;
-    int carros_c = 0;
-
-    //loop principal: so finaliza a execucao quando todos os carros finalizaram o percurso
-    while (concluidos < num_carros) {
+    while (!todos_concluidos) {
         printf("\n--- Ciclo %d ---\n", ++ciclo);
         printf("Semáforo: Fluxo B está %s, Fluxo C está %s\n",
-               semaforo->estado1 ? "verde" : "vermelho",
-               semaforo->estado2 ? "verde" : "vermelho");
+               semaforo->estado1 ? GREEN "verde" RESET : RED "vermelho" RESET,
+               semaforo->estado2 ? GREEN "verde" RESET : RED "vermelho" RESET);
 
-        // reseta os contadores a cada ciclo de carros aguardando
-        carros_b = 0;
-        carros_c = 0;
+        todos_concluidos = 1; 
 
-        // contagem da quantidade de carros aguardando em cada fluxo
         for (int i = 0; i < num_carros; i++) {
+            if (concluidos[i]) continue;
+
             if (indices[i] < strlen(palavras[i])) {
-                if (carros[i] == 'b'){
-                    carros_b++;
-                }
-                if (carros[i] == 'c'){
-                    carros_c++;
-                } 
-            }
-        }
+                char simbolo = palavras[i][indices[i]];
 
-        printf("Carros aguardando - Fluxo B: %d, Fluxo C: %d\n", carros_b, carros_c);
-
-        // alterna o semaforo para o fluxo com mais carros
-        if (carros_b > carros_c && semaforo->estado1 == 0) {
-            semaforo->estado1 = 1;  // abre o fluxo b
-            semaforo->estado2 = 0;  // fecha o fluxo c
-            printf("Semáforo alternado para Fluxo B (prioridade).\n");
-        } else if (carros_c > carros_b && semaforo->estado2 == 0) {
-            semaforo->estado1 = 0;  // fecha o fluxo b
-            semaforo->estado2 = 1;  // abre o fluxo C
-            printf("Semáforo alternado para Fluxo C (prioridade).\n");
-        }
-
-        // processa cada carro
-        for (int i = 0; i < num_carros; i++) {
-            if (indices[i] < strlen(palavras[i])) {  // se o carro ainda nao estacionou
-                char simbolo = palavras[i][indices[i]];  // simbolo atual analisado é o caminho do carro
-
-                // faz verificacao do semaforo antes de avançar
-                if ((carros[i] == 'b' && semaforo->estado1 == 0) ||
-                    (carros[i] == 'c' && semaforo->estado2 == 0)) {
-                    printf("Carro %d está aguardando no semáforo. Fluxo bloqueado.\n", i + 1);
-                    continue; // esperar ata o semaforo abrir
+                // Verifica o semáforo para o fluxo
+                if (carros[i] == 'b' &&
+                    ((estados[i] == 1 && !semaforo->estado1) || (estados[i] == 5 && !semaforo->estado1))) {
+                    printf(RED "Carro %d no fluxo B aguardando semáforo verde.\n" RESET, i + 1);
+                    todos_concluidos = 0;
+                    continue;
                 }
 
+                if (carros[i] == 'c' && (estados[i] == 2 && !semaforo->estado2)) {
+                    printf( RED "Carro %d no fluxo C aguardando semáforo verde.\n" RESET, i + 1);
+                    todos_concluidos = 0;
+                    continue;
+                }
+
+                // Transição do estado
                 printf("Carro %d: estado atual = %d, simbolo = '%c'\n", i + 1, estados[i], simbolo);
 
-                // pegar o proximo estado com base no simbolo atual
                 int prox_estado = pegar_prox_estado(automatos[i], estados[i], simbolo);
                 if (prox_estado == -1) {
-                    printf("Erro: Transição inválida para o carro %d\n", i + 1);
-                    return; // finaliza com erro
+                    printf(RED "Erro: Transição inválida para o carro %d\n" RESET, i + 1);
+                    return;
                 }
 
-
-                estados[i] = prox_estado;  // atualiza o estado para o proximo ja
+                estados[i] = prox_estado;
+                indices[i]++;
                 printf("Carro %d: novo estado = %d\n", i + 1, estados[i]);
 
-                // avanca para o prox simbolo
-                indices[i]++;
-                // verifica se o carro estacionou em algum momento e se estado é de fato um estado final
+                // Verifica se o carro concluiu o percurso
                 if (indices[i] == strlen(palavras[i]) && eh_estado_aceito(automatos[i], estados[i])) {
-                    printf("Carro %d concluiu o percurso.\n", i + 1);
-                    concluidos++;
+                    printf(GREEN "Carro %d concluiu o percurso.\n" RESET, i + 1);
+                    concluidos[i] = 1;
+
+                    // Atualiza o número de carros restantes por fluxo
+                    if (carros[i] == 'b') carros_fluxo_b--;
+                    if (carros[i] == 'c') carros_fluxo_c--;
+                } else {
+                    todos_concluidos = 0;
                 }
             }
+        }
+
+        // Prioriza o fluxo com mais carros
+        if (carros_fluxo_b > carros_fluxo_c) {
+            semaforo->estado1 = 1;
+            semaforo->estado2 = 0;
+        } else if (carros_fluxo_c > carros_fluxo_b) {
+            semaforo->estado1 = 0;
+            semaforo->estado2 = 1;
+        } else {
+            alternar_estado_AD(semaforo); // Alterna caso os fluxos tenham o mesmo número
         }
 
         printf("--- Fim do Ciclo %d ---\n", ciclo);
     }
 
-    printf("\n ----> SIMULAÇÃO BC CONCLUIDA <----\n");
+    printf(CYAN "\n--------> SIMULAÇÃO BC CONCLUÍDA <--------\n" RESET);
 }
 
 
+
+/*
+//implementacao do fluxo AD com semaforo no modo "pisca pisca"
 void criarFluxoComSemaforo_AD(Automaton *afd_a, Automaton *afd_d, char *palavra_a, char *palavra_d, char *carros, Semaforo *semaforo) {
     int estados[max_contagem_carros] = {0}; // Armazena o estado atual do carro
     int indices[max_contagem_carros] = {0}; // Índices para acompanhar a posição atual na palavra de cada carro
     Automaton *automatos[max_contagem_carros] = {NULL}; // Vetor de ponteiros para os autômatos dos carros
     char *palavras[max_contagem_carros] = {NULL}; // Caminhos de cada carro
     int num_carros = strlen(carros); // Quantidade de carros na simulação
+    int concluidos[max_contagem_carros] = {0}; // Marca carros concluídos
 
-    // Verifica se o número de carros não excede o limite permitido
     if (num_carros > max_contagem_carros) {
         printf("Erro: Número de carros excede o máximo permitido (%d).\n", max_contagem_carros);
         return;
     }
 
-    // Configuração inicial dos carros
     for (int i = 0; i < num_carros; i++) {
-        indices[i] = 0; // Cada carro inicia na posição inicial de seu caminho
+        indices[i] = 0; // Cada carro inicia na posição inicial
+        concluidos[i] = 0;
         if (carros[i] == 'a') {
             automatos[i] = afd_a;
-            palavras[i] = palavra_a; // Caminho do fluxo A
+            palavras[i] = palavra_a;
             estados[i] = afd_a->estado_inicial;
         } else if (carros[i] == 'd') {
             automatos[i] = afd_d;
-            palavras[i] = palavra_d; // Caminho do fluxo D
+            palavras[i] = palavra_d;
             estados[i] = afd_d->estado_inicial;
         } else {
             printf("Erro: Carro em fluxo desconhecido '%c'.\n", carros[i]);
@@ -312,85 +317,187 @@ void criarFluxoComSemaforo_AD(Automaton *afd_a, Automaton *afd_d, char *palavra_
         }
     }
 
-    printf("\n\n\n ---> INÍCIO DA SIMULAÇÃO AD SEM TROCA DE SENTIDO <----\n");
-    printf("\nSimulação para o(s) carro(s): %s\n", carros);
+    printf("\n\n ---> INÍCIO DA SIMULAÇÃO AD <----\n");
+    printf("Simulação para o(s) carro(s): %s\n", carros);
 
-    int concluidos = 0;
-    int ciclo = 0;
+    int ciclo = 0, todos_concluidos = 0;
 
-    // Variáveis para contar os carros aguardando em cada fluxo
-    int carros_a = 0, carros_d = 0;
-
-    while (concluidos < num_carros) {
+    while (!todos_concluidos) {
         printf("\n--- Ciclo %d ---\n", ++ciclo);
         printf("Semáforo: Fluxo A está %s, Fluxo D está %s\n",
                semaforo->estado1 ? "verde" : "vermelho",
                semaforo->estado2 ? "verde" : "vermelho");
 
-        // Reseta os contadores de carros aguardando
-        carros_a = 0;
-        carros_d = 0;
+        todos_concluidos = 1; // Assume que todos concluíram, verifica depois
 
-        // Contagem de carros aguardando em cada fluxo
         for (int i = 0; i < num_carros; i++) {
+            if (concluidos[i]) continue; // Pula carros concluídos
+
             if (indices[i] < strlen(palavras[i])) {
-                if (carros[i] == 'a') {
-                    carros_a++;
-                } else if (carros[i] == 'd') {
-                    carros_d++;
-                }
-            }
-        }
-
-        printf("Carros aguardando - Fluxo A: %d, Fluxo D: %d\n", carros_a, carros_d);
-
-        // Alterna o semáforo para o fluxo com mais carros
-        if (carros_a > carros_d && semaforo->estado1 == 0) {
-            semaforo->estado1 = 1;  // Abre o fluxo A
-            semaforo->estado2 = 0;  // Fecha o fluxo D
-            printf("Semáforo alternado para Fluxo A (prioridade).\n");
-        } else if (carros_d > carros_a && semaforo->estado2 == 0) {
-            semaforo->estado1 = 0;  // Fecha o fluxo A
-            semaforo->estado2 = 1;  // Abre o fluxo D
-            printf("Semáforo alternado para Fluxo D (prioridade).\n");
-        }
-
-        // Processa cada carro
-        for (int i = 0; i < num_carros; i++) {
-            if (indices[i] < strlen(palavras[i])) { // Se o carro ainda não concluiu o percurso
                 char simbolo = palavras[i][indices[i]];
 
-                // Verifica o semáforo antes de avançar
-                if ((carros[i] == 'a' && semaforo->estado1 == 0) ||
-                    (carros[i] == 'd' && semaforo->estado2 == 0)) {
-                    printf("Carro %d aguardando no semáforo. Fluxo bloqueado.\n", i + 1);
-                    continue; // Esperar até o semáforo abrir
+                // Verifica dependência do semáforo
+                if (carros[i] == 'a' && ((estados[i] == 2 || estados[i] == 4) && !semaforo->estado1)) {
+                    printf("Carro %d no fluxo A aguardando semáforo verde.\n", i + 1);
+                    todos_concluidos = 0;
+                    continue;
                 }
 
-                printf("Carro %d: estado atual = %d, símbolo = '%c'\n", i + 1, estados[i], simbolo);
+                if (carros[i] == 'd' && (estados[i] == 2 && !semaforo->estado2)) {
+                    printf("Carro %d no fluxo D aguardando semáforo verde.\n", i + 1);
+                    todos_concluidos = 0;
+                    continue;
+                }
 
-                // Pega o próximo estado com base no símbolo atual
+                // Processa transição
+                printf("Carro %d: estado atual = %d, simbolo = '%c'\n", i + 1, estados[i], simbolo);
+
                 int prox_estado = pegar_prox_estado(automatos[i], estados[i], simbolo);
                 if (prox_estado == -1) {
                     printf("Erro: Transição inválida para o carro %d\n", i + 1);
-                    return; // Finaliza com erro
+                    return;
                 }
 
-                estados[i] = prox_estado; // Atualiza para o próximo estado
+                estados[i] = prox_estado;
+                indices[i]++;
                 printf("Carro %d: novo estado = %d\n", i + 1, estados[i]);
 
-                // Avança para o próximo símbolo
-                indices[i]++;
                 // Verifica se o carro concluiu o percurso
                 if (indices[i] == strlen(palavras[i]) && eh_estado_aceito(automatos[i], estados[i])) {
                     printf("Carro %d concluiu o percurso.\n", i + 1);
-                    concluidos++;
+                    concluidos[i] = 1;
+                } else {
+                    todos_concluidos = 0;
                 }
             }
         }
+
+        // Alterna o estado do semáforo após cada ciclo
+        alternar_estado_AD(semaforo);
 
         printf("--- Fim do Ciclo %d ---\n", ciclo);
     }
 
     printf("\n ----> SIMULAÇÃO AD CONCLUÍDA <----\n");
+}
+*/
+
+// fluxo AD que opera com contador de carros
+void criarFluxoComSemaforo_AD(Automaton *afd_a, Automaton *afd_d, char *palavra_a, char *palavra_d, char *carros, Semaforo *semaforo) {
+
+    // verificação para garantir que processe uma palavra que exista de fato
+    if( strlen(carros) == 0 ){
+    //printf( YELLOW "\nFluxo AD não iniciado!\n" RESET );
+    return;
+    }
+
+    int estados[max_contagem_carros] = {0}; // Estado atual do carro
+    int indices[max_contagem_carros] = {0}; // Índices para acompanhar o progresso de cada carro
+    Automaton *automatos[max_contagem_carros] = {NULL}; // Vetor de autômatos
+    char *palavras[max_contagem_carros] = {NULL}; // Palavras para cada carro
+    int concluidos[max_contagem_carros] = {0}; // Carros que concluíram o percurso
+    int num_carros = strlen(carros); // Quantidade de carros
+
+    if (num_carros > max_contagem_carros) {
+        printf(RED "Erro: Número de carros excede o máximo permitido (%d).\n" RESET, max_contagem_carros);
+        return;
+    }
+
+    int carros_fluxo_a = 0, carros_fluxo_d = 0;
+
+    // Inicializa os carros e define seus fluxos
+    for (int i = 0; i < num_carros; i++) {
+        indices[i] = 0; 
+        concluidos[i] = 0;
+
+        if (carros[i] == 'a') {
+            automatos[i] = afd_a;
+            palavras[i] = palavra_a;
+            estados[i] = afd_a->estado_inicial;
+            carros_fluxo_a++;
+        } else if (carros[i] == 'd') {
+            automatos[i] = afd_d;
+            palavras[i] = palavra_d;
+            estados[i] = afd_d->estado_inicial;
+            carros_fluxo_d++;
+        } else {
+            printf("Erro: Carro em fluxo desconhecido '%c'.\n", carros[i]);
+            return;
+        }
+    }
+
+    printf(CYAN "\n\n--------> INÍCIO DA SIMULAÇÃO AD <--------\n" RESET);
+    printf("Simulação para o(s) carro(s): %s\n", carros);
+
+    int ciclo = 0, todos_concluidos = 0;
+
+    while (!todos_concluidos) {
+        printf("\n--- Ciclo %d ---\n", ++ciclo);
+        printf("Semáforo: Fluxo A está %s, Fluxo D está %s\n",
+               semaforo->estado1 ? GREEN "verde" RESET : RED "vermelho" RESET,
+               semaforo->estado2 ? GREEN "verde" RESET : RED "vermelho" RESET);
+
+        todos_concluidos = 1; 
+
+        for (int i = 0; i < num_carros; i++) {
+            if (concluidos[i]) continue; 
+
+            if (indices[i] < strlen(palavras[i])) {
+                char simbolo = palavras[i][indices[i]];
+
+                // Verifica o semáforo para o fluxo
+                if (carros[i] == 'a' && ((estados[i] == 2 || estados[i] == 4) && !semaforo->estado1)) {
+                    printf(RED "Carro %d no fluxo A aguardando semáforo verde.\n" RESET, i + 1);
+                    todos_concluidos = 0;
+                    continue;
+                }
+
+                if (carros[i] == 'd' && (estados[i] == 2 && !semaforo->estado2)) {
+                    printf(RED "Carro %d no fluxo D aguardando semáforo verde.\n" RESET , i + 1);
+                    todos_concluidos = 0;
+                    continue;
+                }
+
+                // Transição do estado
+                printf("Carro %d: estado atual = %d, simbolo = '%c'\n", i + 1, estados[i], simbolo);
+
+                int prox_estado = pegar_prox_estado(automatos[i], estados[i], simbolo);
+                if (prox_estado == -1) {
+                    printf(RED "Erro: Transição inválida para o carro %d\n" RESET, i + 1);
+                    return;
+                }
+
+                estados[i] = prox_estado;
+                indices[i]++;
+                printf("Carro %d: novo estado = %d\n", i + 1, estados[i]);
+
+                // Verifica se o carro concluiu o percurso
+                if (indices[i] == strlen(palavras[i]) && eh_estado_aceito(automatos[i], estados[i])) {
+                    printf(GREEN "Carro %d concluiu o percurso.\n" RESET, i + 1);
+                    concluidos[i] = 1;
+
+                    // Atualiza o número de carros restantes por fluxo
+                    if (carros[i] == 'a') carros_fluxo_a--;
+                    if (carros[i] == 'd') carros_fluxo_d--;
+                } else {
+                    todos_concluidos = 0;
+                }
+            }
+        }
+
+        // Prioriza o fluxo com mais carros
+        if (carros_fluxo_a > carros_fluxo_d) {
+            semaforo->estado1 = 1;
+            semaforo->estado2 = 0;
+        } else if (carros_fluxo_d > carros_fluxo_a) {
+            semaforo->estado1 = 0;
+            semaforo->estado2 = 1;
+        } else {
+            alternar_estado_AD(semaforo); // Alterna caso os fluxos tenham o mesmo número
+        }
+
+        printf("--- Fim do Ciclo %d ---\n", ciclo);
+    }
+
+    printf(CYAN "\n--------> SIMULAÇÃO AD CONCLUÍDA <--------\n" RESET);
 }

@@ -1,6 +1,17 @@
 #include <string.h>
 #include <stdio.h>
 
+#define BLACK "\033[30m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define BLUE "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN "\033[36m"
+#define GRAY "\033[37m"
+#define RESET "\033[0m"
+
+
 #define max_estados 10
 #define max_transicoes 100
 #define max_alfabeto 5

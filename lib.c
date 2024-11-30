@@ -1,16 +1,6 @@
-#define BLACK "\033[30m"
-#define RED "\033[31m"
-#define GREEN "\033[32m"
-#define YELLOW "\033[33m"
-#define BLUE "\033[34m"
-#define MAGENTA "\033[35m"
-#define CYAN "\033[36m"
-#define GRAY "\033[37m"
-#define RESET "\033[0m"
+#include "lib.h"
 
 #define max_contagem_carros 6 // quantidade de carros maxima no fluxo
-
-#include "lib.h"
 
 // funcao para verificar se o estado eh um estado de aceitacao
 int eh_estado_aceito(Automaton *afd, int estado) {
@@ -163,6 +153,9 @@ void separarCaracteres(const char *entrada, char *saida_bc, char *saida_ad) {
             saida_bc[indice_bc++] = entrada[i];
         } else if (entrada[i] == 'a' || entrada[i] == 'd') {
             saida_ad[indice_ad++] = entrada[i];
+        }else{
+            printf(RED "\nCaracter inválido detectado: " RESET "%c\n", entrada[i]);
+            return;
         }
     }
 
@@ -172,6 +165,13 @@ void separarCaracteres(const char *entrada, char *saida_bc, char *saida_ad) {
 }
 
 void criarFluxoComSemaforo_BC(Automaton *afd_b, Automaton *afd_c, char *palavra_b, char *palavra_c, char *carros, Semaforo *semaforo) {
+
+    // verificação para garantir que processe uma palavra que exista de fato
+    if( strlen(carros) == 0 ){
+    //printf( YELLOW "\nFluxo AD não iniciado!\n" RESET );
+    return;
+    }
+
     int estados[max_contagem_carros] = {0}; // Estado atual dos carros
     int indices[max_contagem_carros] = {0}; // Índices para acompanhar o progresso
     Automaton *automatos[max_contagem_carros] = {NULL}; // Vetor de autômatos

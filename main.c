@@ -5,11 +5,11 @@
 
 int main() {
     
-    printf("\n==================================================================\n");
+    printf(CYAN "\n==================================================================\n" RESET);
     printf("\n---- TRABALHO FINAL DA MATÉRIA LINGUAGENS FORMAIS E AUTÕMATOS ----\n");
     printf("\nProfessor: Ricardo Ferreira Martins.\n");
     printf("Alunos: Gustavo de Souza; José Augusto Laube.\n");
-    printf("\n==================================================================\n");
+    printf(CYAN "\n==================================================================\n" RESET);
 
     srand(time(NULL));
     
@@ -120,7 +120,7 @@ int main() {
     char palavra_teste[100];
 
     while(menu){
-            printf("\n\n\n======= MENU DE SELEÇÃO =======\n");
+            printf(CYAN "\n\n\n============" RESET  " MENU DE SELEÇÃO " CYAN "============\n" RESET );
             printf("(1) Simular AFDs de fluxos separadamente;\n");
             printf("(2) Simular fluxo com semaforos (SEM TROCA DE DIREÇÃO);\n");
             printf("(3) Simular fluxo com semaforos (COM TROCA DE DIREÇÃO)(NAO IMPLEMENTADO);\n");

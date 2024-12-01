@@ -12,9 +12,9 @@
 #define RESET "\033[0m"
 
 
-#define max_estados 10
+#define max_estados 15
 #define max_transicoes 100
-#define max_alfabeto 5
+#define max_alfabeto 7
 #define max_carros 10 // qnt de carros andando ao mesmo tempo
 
 // estrutura para transicao
@@ -53,3 +53,4 @@ void alterar_estado(Semaforo * semaforo);
 void definir_caminhos_eficientes(char *palavra_a, char *palavra_b, char *palavra_c, char *palavra_d);
 void criarFluxoComSemaforo_BC(Automaton *afd_b, Automaton *afd_c, char *palavra_b, char *palavra_c, char *carros, Semaforo *semaforo);
 void criarFluxoComSemaforo_AD(Automaton *afd_a, Automaton *afd_d, char *palavra_a, char *palavra_d, char *carros, Semaforo *semaforo);
+void criarFluxoComCurva_BC(Automaton *afd_b, Automaton *afd_c, char *palavra_b, char *palavra_c, char *carros, Semaforo *semaforo);
